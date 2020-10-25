@@ -7,17 +7,6 @@ from project.app import app, db
 TEST_DB = "flaskr.db"
 
 
-@pytest.fixture
-def client():
-    BASE_DIR = Path(__file__).resolve().parent.parent
-    app.config["TESTING"] = True
-    app.config["DATABASE"] = BASE_DIR.joinpath(TEST_DB)
-
-    init_db()  # setup
-    yield app.test_client()  # tests run here
-    init_db()  # teardown
-
-
 def login(client, username, password):
     """Login helper function"""
     return client.post(
@@ -30,6 +19,12 @@ def login(client, username, password):
 def logout(client):
     """Logout helper function"""
     return client.get("/logout", follow_redirects=True)
+
+
+def search(client):
+    return client.get(
+        "/search"
+    )
 
 
 def test_index(client):
@@ -91,3 +86,9 @@ def client():
     db.create_all()  # setup
     yield app.test_client()  # tests run here
     db.drop_all()  # teardown
+
+
+def test_search(client):
+    """test that the search functionality works """
+    response = client.get("/search", content_type="html/text")
+    assert response.status_code == 200

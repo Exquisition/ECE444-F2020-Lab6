@@ -2,9 +2,8 @@ import sqlite3
 from pathlib import Path
 
 from flask import Flask, g, render_template, request, session, \
-                  flash, redirect, url_for, jsonify
+    flash, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
-
 
 basedir = Path(__file__).resolve().parent
 
@@ -15,7 +14,6 @@ PASSWORD = "admin"
 SECRET_KEY = "change_me"
 SQLALCHEMY_DATABASE_URI = f'sqlite:///{Path(basedir).joinpath(DATABASE)}'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
-
 
 # create and initialize a new Flask app
 app = Flask(__name__)
@@ -84,5 +82,14 @@ def delete_entry(post_id):
     return jsonify(result)
 
 
+@app.route('/search', methods=['GET'])
+def search():
+    query = request.args.get("query")
+    entries = db.session.query(models.Post)
+    if query:
+        return render_template('search.html', entries=entries, query=query)
+    return render_template('search.html')
+
+
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
