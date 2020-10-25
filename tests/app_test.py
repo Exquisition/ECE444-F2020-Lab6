@@ -79,6 +79,7 @@ def test_delete_message(client):
     data = json.loads(rv.data)
     assert data["status"] == 1
 
+
 @pytest.fixture
 def client():
     BASE_DIR = Path(__file__).resolve().parent.parent
@@ -95,3 +96,10 @@ def test_search(client):
     """test that the search functionality works """
     response = client.get("/search", content_type="html/text")
     assert response.status_code == 200
+
+
+def test_login_required(client):
+    """test that you cannot delete without logging in """
+    rv = client.get("/delete/1")
+    data = json.loads(rv.data)
+    assert data["message"] == 'Please log in.'
